@@ -18,8 +18,10 @@ from  operator import mul
 from    random import randrange
 from      math import ceil
 
+'''use "from fractions import gcd" to get gcd function'''
+
 def factorial(n):
-    return reduce(lambda x, y : x*y, range(1, n+1), 1)
+    return reduce(lambda x, y : x*y, xrange(1, n+1), 1)
 
 def is_permutation(a,b):
     return sorted(str(a)) == sorted(str(b))
@@ -27,9 +29,12 @@ def is_permutation(a,b):
 def is_palindromic(n):
     return str(n) == str(n)[::-1]
 
-def is_pandigital(n, s = 9):
-    n = str(n)
-    return len(n) == s and not '1234567890'[:s].strip(n)
+def is_pandigital(n, min=0, max=9):
+    """A number is min-max pandigital if it makes use of all
+the digits min to max exactly once"""
+    assert 0 <= min <= max <= 9
+    s = str(n)
+    return len(s) == max - min + 1 and sorted(s) == list('0123456789'[min:max + 1])
 
 def is_prime(n):
     """Deterministic primality test based on the P3 prime candidate generator.
@@ -40,7 +45,7 @@ def is_prime(n):
         return False
     if n > 5 and (n % 6 not in [1, 5] or n % 5 == 0):
         return False
-    for c in range(7, isqrt(n), 2):
+    for c in xrange(7, isqrt(n), 2):
         p1, k, p2 = 5 * c, 6 * c, 7 * c
         if (n - p1) % k == 0 or (n - p2) % k == 0:
             return False
@@ -55,7 +60,7 @@ def miller_rabin_pass(a, s, d, n):
     a_to_power = pow(a, d, n)
     if a_to_power == 1:
         return True
-    for i in range(s-1):
+    for i in xrange(s-1):
         if a_to_power == n - 1:
             return True
         a_to_power = (a_to_power * a_to_power) % n
@@ -69,7 +74,7 @@ def miller_rabin(n):
     while d % 2 == 0:
         d >>= 1
         s += 1
-    for repeat in range(20):
+    for repeat in xrange(20):
         a = 0
         while a == 0:
             a = randrange(n)
@@ -153,18 +158,6 @@ def number_of_divisors(n, square=False):
         powers_plus = map(lambda x:   x + 1, d.values())
     return reduce(mul, powers_plus, 1)
 
-def gcd(a, b):
-    """Returns the GCD of A and B.
-    """
-    a, b = abs(a), abs(b)
-    if a == 0:
-        return b
-    if b == 0:
-        return a
-    while b != 0:
-        (a, b) = (b, a%b)
-    return a
-
 def permutation(n, s):
     """Returns a permutation of sequence S.
     """
@@ -182,7 +175,7 @@ def partition(seq, key=bool):
 
 def binomial(n, k):
     nt = 1
-    for t in range(min(k, n-k)):
+    for t in xrange(min(k, n-k)):
         nt = nt * (n - t) // (t + 1)
     return nt
 
@@ -194,7 +187,7 @@ def prime_sieve(n):
     import numpy as np
     sieve = np.ones(n/3 + (n % 6 == 2), dtype = np.bool)
     sieve[0] = False
-    for i in range(int(n**0.5) // 3 + 1):
+    for i in xrange(int(n**0.5) // 3 + 1):
         if sieve[i]:
             k = 3 * i + 1|1
             sieve[      ((k*k)//3)      ::2*k] = False
@@ -205,8 +198,8 @@ def triangle_maximal_sum(t):
     """Returns the maximal path from the root of a tree to a leaf.  t is a list of lists,
     representing the tree top-down.
     """
-    for row in range(len(t)-1, 0, -1):
-        for col in range(0, row):
+    for row in xrange(len(t)-1, 0, -1):
+        for col in xrange(0, row):
             dt[row-1][col] += max(t[row][col], t[row][col+1])
     return t[0][0]
 
@@ -232,7 +225,7 @@ def polygonal(dim):
     """Generates a series of polygonal numbers for n = [3, 8].
     """
     if dim < 3 or dim > 8:
-        return NotImplemented
+        raise NotImplementedError
     n = 0
     func = {
         3 : lambda x: x * (x + 1) // 2,
@@ -267,7 +260,7 @@ def cf(n):
             break
 
 def phi(n):
-    """Computes the Euler's totient function φ(n) - number of positive numbers less than
+    """Computes the Euler's totient function phi(n) - number of positive numbers less than
     or equal to n which are relatively prime to n.
     """
     from functools import reduce
